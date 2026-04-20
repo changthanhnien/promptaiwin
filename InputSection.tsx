@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { Upload, FileVideo, RefreshCw, Zap, MessageSquare, Link as LinkIcon, Youtube, Sparkles } from 'lucide-react';
-import { InputMode, FeatureId, ToneId } from '../types';
-import { FEATURES, TONES } from '../constants';
+import { InputMode, FeatureId, ToneId } from './types';
+import { FEATURES, TONES } from './constants';
 import { FeatureCard } from './FeatureCard';
 
 interface InputSectionProps {
@@ -108,7 +108,6 @@ export const InputSection: React.FC<InputSectionProps> = ({
       <div className="glass-panel rounded-2xl p-6">
         <SectionTitle icon={Upload} title="Nguồn Video" />
         
-        {/* Toggle Switches */}
         <div className="flex bg-slate-900/50 p-1 rounded-lg mb-4 border border-white/5">
             <button
                 onClick={() => setInputMode(InputMode.FILE)}

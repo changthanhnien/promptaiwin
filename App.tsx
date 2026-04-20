@@ -1,8 +1,8 @@
 import React, { useState, useRef } from 'react';
-import { InputSection } from './components/InputSection';
-import { ResultSection } from './components/ResultSection';
+import { InputSection } from './InputSection';
+import { ResultSection } from './ResultSection';
 import { InputMode, FeatureId, ToneId, AnalysisResult } from './types';
-import { analyzeVideo } from './services/geminiService';
+import { analyzeVideo } from './geminiService';
 
 export default function App() {
   const [inputMode, setInputMode] = useState<InputMode>(InputMode.FILE);
@@ -49,7 +49,6 @@ export default function App() {
         mimeType = file.type;
       }
 
-      // Use the passed feature or current state
       const featureToUse = feature || selectedFeature;
 
       const analysisData = await analyzeVideo(
@@ -63,7 +62,6 @@ export default function App() {
 
       setResult(analysisData);
       
-      // Auto-scroll to result on mobile after analysis
       setTimeout(() => {
         if (window.innerWidth < 1024 && resultRef.current) {
             resultRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -86,7 +84,6 @@ export default function App() {
 
   const handleQuickAction = (featureId: FeatureId) => {
     setSelectedFeature(featureId);
-    // Use timeout to allow state update before triggering analysis, or pass explicitly
     setTimeout(() => {
         performAnalysis(featureId);
     }, 100);
@@ -101,11 +98,8 @@ export default function App() {
   };
 
   return (
-    // CHANGE 1: Use lg:h-screen and lg:overflow-hidden to only lock scroll on large screens. 
-    // On mobile, let it scroll naturally (min-h-screen).
     <div className="app-bg min-h-screen text-slate-200 selection:bg-primary/30 selection:text-white flex flex-col lg:h-screen lg:overflow-hidden">
       
-      {/* Modern Header */}
       <header className="shrink-0 flex items-center justify-between p-4 lg:px-6 lg:py-4 border-b border-white/5 bg-background/50 backdrop-blur-md z-30 sticky top-0 lg:relative">
           <div className="flex items-center gap-4">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
@@ -129,14 +123,9 @@ export default function App() {
           </div>
       </header>
 
-      {/* Main Content Grid */}
-      {/* CHANGE 2: lg:overflow-hidden ensures only desktop main area is clipped for internal scrolling. Mobile grows. */}
       <div className="flex-1 lg:overflow-hidden">
-          {/* CHANGE 3: h-auto on mobile, h-full on desktop */}
           <div className="max-w-[1600px] mx-auto h-auto lg:h-full grid grid-cols-1 lg:grid-cols-12 gap-0 lg:gap-8 p-0 lg:p-6">
             
-            {/* Left Panel: Inputs */}
-            {/* CHANGE 4: Always visible (block) to stack on top of results on mobile */}
             <div className={`
                 lg:col-span-5 p-4 lg:p-0
                 lg:h-full lg:overflow-y-auto custom-scrollbar
@@ -160,8 +149,6 @@ export default function App() {
               />
             </div>
 
-            {/* Right Panel: Result */}
-            {/* CHANGE 5: On desktop, flex-col h-full allows the internal ResultSection to manage scroll. */}
             <div 
                 ref={resultRef}
                 className={`
@@ -169,7 +156,6 @@ export default function App() {
                 lg:h-full lg:flex lg:flex-col
                 ${!result ? 'hidden lg:flex' : 'flex'}
             `}>
-                {/* Removed 'Back to Upload' button since Upload is now visible above */}
               <ResultSection 
                 inputMode={inputMode}
                 file={file}

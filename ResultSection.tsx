@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { Copy, Bot, Play, Pause, Volume2, VolumeX, Maximize2, Globe, Sparkles, Download, Clapperboard, Check, FileText, FileJson, Clock, RotateCcw, Layers, ScrollText, Zap } from 'lucide-react';
-import { AnalysisResult, InputMode, FeatureId, ToneId } from '../types';
+import { AnalysisResult, InputMode, FeatureId, ToneId } from './types';
 
 interface ResultSectionProps {
   inputMode: InputMode;
@@ -21,7 +21,6 @@ const formatTime = (time: number) => {
   return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
 };
 
-// Helper component for individual copy buttons
 const CopyButton = ({ text, className = "" }: { text: string, className?: string }) => {
   const [copied, setCopied] = useState(false);
 
@@ -170,11 +169,9 @@ export const ResultSection: React.FC<ResultSectionProps> = ({
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-        // Handle Top Menu
         if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
             setShowDownloadMenu(false);
         }
-        // Handle Bottom Menu
         if (bottomMenuRef.current && !bottomMenuRef.current.contains(event.target as Node)) {
             setShowBottomDownloadMenu(false);
         }
@@ -195,11 +192,9 @@ export const ResultSection: React.FC<ResultSectionProps> = ({
 
   const copyFullSequencePrompt = () => {
     if (!result) return;
-    // Concat ONLY the English prompts with arrows or numbering to indicate flow
     const text = result.segments.map((s, idx) => 
         `Shot ${idx + 1} (${s.time}): ${s.analysis}`
     ).join('\nNEXT SHOT:\n');
-    
     navigator.clipboard.writeText(text);
     setCopiedFullPrompt(true);
     setTimeout(() => setCopiedFullPrompt(false), 2000);
@@ -210,7 +205,6 @@ export const ResultSection: React.FC<ResultSectionProps> = ({
     const text = result.segments.map((s, idx) => 
         `Cảnh ${idx + 1} (${s.time}): ${s.visual}`
     ).join('\n\n');
-    
     navigator.clipboard.writeText(text);
     setCopiedVietnamese(true);
     setTimeout(() => setCopiedVietnamese(false), 2000);
@@ -219,7 +213,6 @@ export const ResultSection: React.FC<ResultSectionProps> = ({
   const downloadFile = (format: 'txt' | 'json' | 'doc') => {
     if (!result) return;
     
-    // Prepare the Full Sequence Prompt string
     const fullSequence = result.segments.map((s, idx) => 
         `Shot ${idx + 1} (${s.time}): ${s.analysis}`
     ).join('\nNEXT SHOT:\n');
@@ -233,7 +226,6 @@ export const ResultSection: React.FC<ResultSectionProps> = ({
         mimeType = "application/json";
         extension = "json";
     } else if (format === 'doc') {
-        // GENERATE HTML-BASED WORD DOCUMENT
         mimeType = "application/msword";
         extension = "doc"; 
         
@@ -256,22 +248,18 @@ export const ResultSection: React.FC<ResultSectionProps> = ({
             </head>
             <body>
                 <h1>${result.title}</h1>
-                
                 <div class="summary">
                     <p><strong>SUMMARY:</strong></p>
                     <p>${result.summary}</p>
                 </div>
-
                 <div class="sequence">
                     <p><strong>TỔNG HỢP CHUỖI PROMPT LIỀN MẠCH (FULL SEQUENCE):</strong></p>
                     <p style="font-family: 'Courier New', monospace; font-size: 11pt; color: #312e81; white-space: pre-wrap;">${fullSequence}</p>
                 </div>
-                
                 <br/>
                 <h3>CHI TIẾT TỪNG PHÂN CẢNH (SCENE DETAILS)</h3>
                 <hr/>
                 <br/>
-                
                 ${result.segments.map(s => `
                     <div class="segment">
                         <div class="time">[${s.time}]</div>
@@ -287,7 +275,6 @@ export const ResultSection: React.FC<ResultSectionProps> = ({
             </html>
         `;
     } else {
-        // Plain text fallback
         content = `TITLE: ${result.title}\nSUMMARY: ${result.summary}\n\n`;
         content += `========================================\n`;
         content += `TỔNG HỢP CHUỖI PROMPT LIỀN MẠCH (FULL SEQUENCE)\n`;
@@ -296,7 +283,6 @@ export const ResultSection: React.FC<ResultSectionProps> = ({
         content += `========================================\n`;
         content += `CHI TIẾT TỪNG PHÂN CẢNH\n`;
         content += `========================================\n\n`;
-        
         result.segments.forEach(s => {
             content += `[TIME: ${s.time}]\n`;
             content += `${labels.visual}: ${s.visual}\n`;
@@ -363,7 +349,6 @@ export const ResultSection: React.FC<ResultSectionProps> = ({
                 Kết quả phân tích
             </h2>
             <div className="flex items-center gap-2">
-                 {/* Minimal View Toggle */}
                  {isPromptFeature && result && (
                     <button 
                         onClick={() => setIsMinimalView(!isMinimalView)}
@@ -558,7 +543,6 @@ export const ResultSection: React.FC<ResultSectionProps> = ({
                             ))}
                         </div>
                     ) : (
-                        /* MINIMAL PROMPT BOARD VIEW */
                         <div className="grid grid-cols-1 gap-4 pb-8">
                              <div className="flex items-center gap-2 px-6 py-2 bg-indigo-500/5 border-b border-indigo-500/10 mb-4">
                                 <Bot size={14} className="text-indigo-400" />

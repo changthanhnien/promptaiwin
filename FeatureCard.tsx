@@ -1,5 +1,5 @@
 import React from 'react';
-import { Feature, FeatureId } from '../types';
+import { Feature, FeatureId } from './types';
 
 interface FeatureCardProps {
   feature: Feature;

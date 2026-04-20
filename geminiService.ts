@@ -1,5 +1,5 @@
 import { GoogleGenAI, Type, Schema } from "@google/genai";
-import { FeatureId, ToneId, AnalysisResult } from "../types";
+import { FeatureId, ToneId, AnalysisResult } from "./types";
 
 const mapToneToPrompt = (tone: ToneId): string => {
   switch (tone) {
@@ -142,7 +142,6 @@ const responseSchema: Schema = {
   required: ["title", "summary", "segments"]
 };
 
-// String representation of schema for prompt injection when using tools
 const jsonStructurePrompt = `
 STRICT OUTPUT FORMAT:
 You MUST return ONLY a valid JSON object. Do not add any markdown formatting (like \`\`\`json) or conversational text.
@@ -168,7 +167,7 @@ function extractJSON(text: string): string {
   if (start !== -1 && end !== -1 && end > start) {
     return text.substring(start, end + 1);
   }
-  return text; // Return original if pattern not found, hopefully it's valid JSON
+  return text;
 }
 
 export const analyzeVideo = async (
@@ -253,14 +252,12 @@ export const analyzeVideo = async (
   try {
     const requestConfig: any = {
       systemInstruction: systemInstruction,
-      temperature: 0.2, // Reduced temperature for strict adherence to facts
+      temperature: 0.2,
     };
 
     if (isUrlMode) {
-      // When using tools (Search), we cannot set responseSchema or responseMimeType
       requestConfig.tools = [{ googleSearch: {} }];
     } else {
-      // When using Video File, we use strict JSON mode
       requestConfig.responseMimeType = "application/json";
       requestConfig.responseSchema = responseSchema;
     }
@@ -281,7 +278,6 @@ export const analyzeVideo = async (
       try {
         const result = JSON.parse(jsonStr) as AnalysisResult;
 
-        // Extract grounding metadata if available (for Search mode)
         const groundingChunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks;
         if (groundingChunks) {
           result.sources = groundingChunks
@@ -289,7 +285,7 @@ export const analyzeVideo = async (
               title: chunk.web?.title || 'Web Source',
               uri: chunk.web?.uri || ''
             }))
-            .filter((s: any) => s.uri); // Filter out empty URIs
+            .filter((s: any) => s.uri);
         }
 
         return result;
